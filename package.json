@@ -1,0 +1,28 @@
+{
+  "name": "pong",
+  "version": "0.0.1",
+  "description": "",
+  "main": "dist/app.js",
+  "scripts": {
+    "dev": "node --experimental-strip-types src/app.ts",
+    "build": "tsc",
+    "start": "node dist/app.js",
+    "typecheck": "tsc --noEmit",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "^11.5.0",
+      "onFail": "download"
+    }
+  },
+  "type": "module",
+  "devDependencies": {
+    "@types/node": "25.9.1",
+    "typescript": "6.0.3"
+  }
+}
