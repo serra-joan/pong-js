@@ -78,6 +78,9 @@ function renderGrid({
     gameGrid, 
     debug
 }: RenderGrid): void {
+    // cmd + k / ctrl + k
+    process.stdout.write('\x1Bc');
+
     console.log(`P1 (up: w, down: s), P2 (up: arrow up, down: arrow down)            P1 0 / P2 0`) // TODO: points
 
     for (const row of gameGrid) {
