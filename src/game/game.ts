@@ -49,7 +49,6 @@ class Game implements GameConstructor {
     
     // Render the map grid
     constructMapGrid() {
-
         // make Grid (y,x)
         const mapGrid: GameGrid = new Map()
 
