@@ -28,13 +28,17 @@ const game = new Game({
     },
     ball: BALL_INITIAL_POSITION
 })
+const movesP = {
+    p1: null as PlayerMoves,
+    p2: null as PlayerMoves
+}
 
 // Load game
 function loadGame() {
     game.constructMapGrid()
 
     // Start Game bucle
-    gameInterval = setInterval(() => game.constructMapGrid(), GLOBALS.REFRESH_SCREEN); 
+    gameInterval = setInterval(() => gameLoop(), GLOBALS.REFRESH_SCREEN); 
 }
 
 async function setupKeyboard() {
@@ -54,29 +58,35 @@ async function setupKeyboard() {
             if (key.name === "space") gameIntervalToggel()
 
         } else {
-            if (key.name === "up") movePaddel({ paddelP: "p2", move: GLOBALS.MOVE_UP })
-            else if (key.name === "down") movePaddel({ paddelP: "p2", move: GLOBALS.MOVE_DOWN })
-            else if (key.name === "w") movePaddel({ paddelP: "p1", move: GLOBALS.MOVE_UP })
-            else if (key.name === "s") movePaddel({ paddelP: "p1", move: GLOBALS.MOVE_DOWN })
+            if (key.name === "up") movesP.p2 = GLOBALS.MOVE_UP
+            else if (key.name === "down") movesP.p2 = GLOBALS.MOVE_DOWN
+            else if (key.name === "w") movesP.p1 = GLOBALS.MOVE_UP
+            else if (key.name === "s") movesP.p1 = GLOBALS.MOVE_DOWN
             else if (key.name === "space") gameIntervalToggel() // pause
         }
     })
 }
 
-async function movePaddel({
-    paddelP, 
-    move
-}: { paddelP: "p1" | "p2", move: PlayerMoves }) {
-    await game.calcPaddelPosition({move, paddelP: paddelP})
-}
-
 function gameIntervalToggel() {
-    if (gameInterval === null) gameInterval = setInterval(() => game.constructMapGrid(), GLOBALS.REFRESH_SCREEN)
+    if (gameInterval === null) gameInterval = setInterval(() => gameLoop(), GLOBALS.REFRESH_SCREEN)
     else {
         clearInterval(gameInterval)
         gameInterval = null
     }
 }
+
+function gameLoop() {
+    // control the paddels movement, if GLOBALS.HOLD_MOVES is false, the paddels will only move when a key is pressed, 
+    // otherwise they will keep moving on the direction of the last key pressed, until another key is pressed
+    if (movesP.p1 !== null) game.calcPaddelPosition({paddelP: "p1", move: movesP.p1})
+    if (movesP.p2 !== null) game.calcPaddelPosition({paddelP: "p2", move: movesP.p2})
+    if (!GLOBALS.HOLD_MOVES) {
+        movesP.p1 = null
+        movesP.p2 = null
+    }
+
+    game.constructMapGrid()
+} 
 
 setupKeyboard()
 loadGame()
