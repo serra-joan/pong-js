@@ -42,7 +42,7 @@ export function printScreen({
     return newBall
 }
 
-export function paddelPosition({
+export async function paddelPosition({
     mapY,
     move,
     actualPaddelPosition

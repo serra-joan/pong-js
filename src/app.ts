@@ -1,7 +1,7 @@
 import { exit } from "node:process"
 import { emitKeypressEvents } from "node:readline"
 import { paddelPosition, printScreen } from "./game/printer.ts"
-import type { BallPosition, PaddelPosition } from "./types.ts"
+import type { PlayerMoves, BallPosition, PaddelPosition } from "./types.ts"
 import { GLOBALS } from "./constants/global.ts"
 
 // globals
@@ -45,23 +45,31 @@ function loadGame() {
     }), GLOBALS.REFRESH_SCREEN)
 }
 
-function setupKeyboard() {
+async function setupKeyboard() {
     emitKeypressEvents(process.stdin)
 
     process.stdin.setRawMode(true)
     process.stdin.resume()
 
-    process.stdin.on("keypress", (_str, key) => {
+    process.stdin.on("keypress", async (_str, key) => {
         if (key.ctrl && key.name === "c") {
             process.stdin.setRawMode(false)
             exit()
         }
 
-        if (key.name === "up") actualPaddelPositionP2 = paddelPosition({ mapY: GLOBALS.MAP_Y, move: GLOBALS.MOVE_UP, actualPaddelPosition: actualPaddelPositionP2 })
-        else if (key.name === "down") actualPaddelPositionP2 = paddelPosition({ mapY: GLOBALS.MAP_Y, move: GLOBALS.MOVE_DOWN, actualPaddelPosition: actualPaddelPositionP2 })
-        else if (key.name === "w") actualPaddelPositionP1 = paddelPosition({ mapY: GLOBALS.MAP_Y, move: GLOBALS.MOVE_UP, actualPaddelPosition: actualPaddelPositionP1 })
-        else if (key.name === "s") actualPaddelPositionP1 = paddelPosition({ mapY: GLOBALS.MAP_Y, move: GLOBALS.MOVE_DOWN, actualPaddelPosition: actualPaddelPositionP1 })
+        if (key.name === "up") movePaddel({ paddelP: "P2", move: GLOBALS.MOVE_UP })
+        else if (key.name === "down") movePaddel({ paddelP: "P2", move: GLOBALS.MOVE_DOWN })
+        else if (key.name === "w") movePaddel({ paddelP: "P1", move: GLOBALS.MOVE_UP })
+        else if (key.name === "s") movePaddel({ paddelP: "P1", move: GLOBALS.MOVE_DOWN })
     })
+}
+
+async function movePaddel({
+    paddelP, 
+    move
+}: { paddelP: "P1" | "P2", move: PlayerMoves }) {
+    if (paddelP === "P1") actualPaddelPositionP1 = await paddelPosition({ mapY: GLOBALS.MAP_Y, move, actualPaddelPosition: actualPaddelPositionP1 })
+    else actualPaddelPositionP2 = await paddelPosition({ mapY: GLOBALS.MAP_Y, move, actualPaddelPosition: actualPaddelPositionP2 })
 }
 
 setupKeyboard()
