@@ -16,7 +16,7 @@ const BALL_INITIAL_POSITION: BallPosition = {
 }
 
 // game variables
-let gameInterval
+let gameInterval: ReturnType<typeof setInterval> | null = null
 const game = new Game({
     mapGlobals: {
         x: GLOBALS.MAP_X,
@@ -33,8 +33,8 @@ const game = new Game({
 function loadGame() {
     game.constructMapGrid()
 
-    // set interval
-    gameInterval = setInterval(() => game.constructMapGrid(), GLOBALS.REFRESH_SCREEN)
+    // Start Game bucle
+    gameInterval = setInterval(() => game.constructMapGrid(), GLOBALS.REFRESH_SCREEN); 
 }
 
 async function setupKeyboard() {
@@ -49,10 +49,17 @@ async function setupKeyboard() {
             exit()
         }
 
-        if (key.name === "up") movePaddel({ paddelP: "p2", move: GLOBALS.MOVE_UP })
-        else if (key.name === "down") movePaddel({ paddelP: "p2", move: GLOBALS.MOVE_DOWN })
-        else if (key.name === "w") movePaddel({ paddelP: "p1", move: GLOBALS.MOVE_UP })
-        else if (key.name === "s") movePaddel({ paddelP: "p1", move: GLOBALS.MOVE_DOWN })
+        // If the game is paused, the paddels can not be moved
+        if (gameInterval === null){
+            if (key.name === "space") gameIntervalToggel()
+
+        } else {
+            if (key.name === "up") movePaddel({ paddelP: "p2", move: GLOBALS.MOVE_UP })
+            else if (key.name === "down") movePaddel({ paddelP: "p2", move: GLOBALS.MOVE_DOWN })
+            else if (key.name === "w") movePaddel({ paddelP: "p1", move: GLOBALS.MOVE_UP })
+            else if (key.name === "s") movePaddel({ paddelP: "p1", move: GLOBALS.MOVE_DOWN })
+            else if (key.name === "space") gameIntervalToggel() // pause
+        }
     })
 }
 
@@ -61,6 +68,14 @@ async function movePaddel({
     move
 }: { paddelP: "p1" | "p2", move: PlayerMoves }) {
     await game.calcPaddelPosition({move, paddelP: paddelP})
+}
+
+function gameIntervalToggel() {
+    if (gameInterval === null) gameInterval = setInterval(() => game.constructMapGrid(), GLOBALS.REFRESH_SCREEN)
+    else {
+        clearInterval(gameInterval)
+        gameInterval = null
+    }
 }
 
 setupKeyboard()

@@ -126,7 +126,7 @@ class Game implements GameConstructor {
         // cmd + k / ctrl + k
         process.stdout.write('\x1Bc');
 
-        console.log(`P1 (up: w, down: s), P2 (up: arrow up, down: arrow down)            P1 0 / P2 0`) // TODO: points
+        console.log(`P1 (up: w, down: s), P2 (up: arrow up, down: arrow down), Space to pause            P1 0 / P2 0`) // TODO: points
 
         for (let y = 0; y < GLOBALS.MAP_Y; y++) {
             let line = ""
