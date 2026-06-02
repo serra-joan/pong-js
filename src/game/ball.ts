@@ -1,30 +1,41 @@
-import type { BallPosition, PrintScreenParams } from "../types.ts"
+import type { BallPosition, PaddelPosition } from "../types.ts"
+
+interface CalcBallPosition {
+    mapGlobals: {
+        mapX: number
+        mapY: number
+    }
+    paddels: {
+        p1: PaddelPosition
+        p2: PaddelPosition
+    }
+    ball: BallPosition
+}
 
 export function moveBall({
-    map: { mapX, mapY },
-    paddelPositionP1,
-    paddelPositionP2,
-    ballPosition,
-}: PrintScreenParams) {
+    mapGlobals: { mapX, mapY },
+    paddels,
+    ball,
+}: CalcBallPosition) {
     // create new positions
     const newBall: BallPosition = {
-        x: ballPosition.x + ballPosition.direction.x,
-        y: ballPosition.y + ballPosition.direction.y,
+        x: ball.x + ball.direction.x,
+        y: ball.y + ball.direction.y,
         direction: {
-            x: ballPosition.direction.x,
-            y: ballPosition.direction.y
+            x: ball.direction.x,
+            y: ball.direction.y
         }
     }
 
     // X
         // check if the ball touc the paddel
         // paddel 2
-    if (newBall.x +1 === mapX - 3 && (newBall.y <= paddelPositionP2.bottomY && newBall.y >= paddelPositionP2.topY)) {
+    if (newBall.x +1 === mapX - 3 && (newBall.y <= paddels.p2.bottomY && newBall.y >= paddels.p2.topY)) {
         newBall.x = newBall.x - 1
         newBall.direction.x = newBall.direction.x * -1
         
         // paddel 1
-    }else if (newBall.x -1 === 2 && (newBall.y <= paddelPositionP1.bottomY && newBall.y >= paddelPositionP1.topY)) {
+    }else if (newBall.x -1 === 2 && (newBall.y <= paddels.p1.bottomY && newBall.y >= paddels.p1.topY)) {
         newBall.x = newBall.x + 1
         newBall.direction.x = newBall.direction.x * -1
 

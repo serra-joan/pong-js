@@ -16,26 +16,3 @@ export type BallPosition = {
         y: 1 | -1 | 0 // top -> 1, bottom -> -1, straight -> 0
     }
 }  
-
-export type GameGrid = Map<string,string>
-
-export type PrintScreenParams = {
-    map: {
-        mapX: number
-        mapY: number
-    }
-    paddelPositionP1: PaddelPosition
-    paddelPositionP2: PaddelPosition
-    ballPosition: BallPosition
-}
-
-export type PaddelPositionParams = {
-    mapY: number
-    move: PlayerMoves
-    actualPaddelPosition: PaddelPosition
-}
-
-export type RenderGrid = {
-    gameGrid: GameGrid
-    debug: string|null
-}

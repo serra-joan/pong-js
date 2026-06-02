@@ -1,6 +1,6 @@
 import { exit } from "node:process"
 import { emitKeypressEvents } from "node:readline"
-import { paddelPosition, printScreen } from "./game/printer.ts"
+import Game from "./game/game.ts"
 import type { PlayerMoves, BallPosition, PaddelPosition } from "./types.ts"
 import { GLOBALS } from "./constants/global.ts"
 
@@ -16,33 +16,25 @@ const BALL_INITIAL_POSITION: BallPosition = {
 }
 
 // game variables
-let game
-let ballPosition: BallPosition = BALL_INITIAL_POSITION
-let actualPaddelPositionP1: PaddelPosition = PADDEL_INITIAL_POSITION
-let actualPaddelPositionP2: PaddelPosition = PADDEL_INITIAL_POSITION
+let gameInterval
+const game = new Game({
+    mapGlobals: {
+        x: GLOBALS.MAP_X,
+        y: GLOBALS.MAP_Y,
+    },
+    paddels: {
+        p1: PADDEL_INITIAL_POSITION, 
+        p2: PADDEL_INITIAL_POSITION, 
+    },
+    ball: BALL_INITIAL_POSITION
+})
 
 // Load game
 function loadGame() {
-    ballPosition = printScreen({
-        map: {
-            mapX: GLOBALS.MAP_X,
-            mapY: GLOBALS.MAP_Y,
-        },
-        paddelPositionP1: actualPaddelPositionP1,
-        paddelPositionP2: actualPaddelPositionP2,
-        ballPosition
-    })
+    game.constructMapGrid()
 
     // set interval
-    game = setInterval(() => ballPosition = printScreen({
-        map: {
-            mapX: GLOBALS.MAP_X,
-            mapY: GLOBALS.MAP_Y,
-        },
-        paddelPositionP1: actualPaddelPositionP1,
-        paddelPositionP2: actualPaddelPositionP2,
-        ballPosition
-    }), GLOBALS.REFRESH_SCREEN)
+    gameInterval = setInterval(() => game.constructMapGrid(), GLOBALS.REFRESH_SCREEN)
 }
 
 async function setupKeyboard() {
@@ -57,19 +49,18 @@ async function setupKeyboard() {
             exit()
         }
 
-        if (key.name === "up") movePaddel({ paddelP: "P2", move: GLOBALS.MOVE_UP })
-        else if (key.name === "down") movePaddel({ paddelP: "P2", move: GLOBALS.MOVE_DOWN })
-        else if (key.name === "w") movePaddel({ paddelP: "P1", move: GLOBALS.MOVE_UP })
-        else if (key.name === "s") movePaddel({ paddelP: "P1", move: GLOBALS.MOVE_DOWN })
+        if (key.name === "up") movePaddel({ paddelP: "p2", move: GLOBALS.MOVE_UP })
+        else if (key.name === "down") movePaddel({ paddelP: "p2", move: GLOBALS.MOVE_DOWN })
+        else if (key.name === "w") movePaddel({ paddelP: "p1", move: GLOBALS.MOVE_UP })
+        else if (key.name === "s") movePaddel({ paddelP: "p1", move: GLOBALS.MOVE_DOWN })
     })
 }
 
 async function movePaddel({
     paddelP, 
     move
-}: { paddelP: "P1" | "P2", move: PlayerMoves }) {
-    if (paddelP === "P1") actualPaddelPositionP1 = await paddelPosition({ mapY: GLOBALS.MAP_Y, move, actualPaddelPosition: actualPaddelPositionP1 })
-    else actualPaddelPositionP2 = await paddelPosition({ mapY: GLOBALS.MAP_Y, move, actualPaddelPosition: actualPaddelPositionP2 })
+}: { paddelP: "p1" | "p2", move: PlayerMoves }) {
+    await game.calcPaddelPosition({move, paddelP: paddelP})
 }
 
 setupKeyboard()
