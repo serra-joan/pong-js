@@ -40,7 +40,7 @@ export function moveBall({
 
     // Y
         // top
-    if (newBall.y <= 0) {
+    if (newBall.y <= 1) {
         newBall.y = 1
         newBall.direction.y = 1
 
