@@ -17,7 +17,7 @@ export type BallPosition = {
     }
 }  
 
-export type GameGrid = string[][]
+export type GameGrid = Map<string,string>
 
 export type PrintScreenParams = {
     map: {

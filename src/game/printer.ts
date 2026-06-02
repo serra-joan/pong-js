@@ -1,4 +1,4 @@
-import type { RenderGrid, PaddelPositionParams, PrintScreenParams } from "../types.ts"
+import type { GameGrid, RenderGrid, PaddelPositionParams, PrintScreenParams } from "../types.ts"
 import { GLOBALS } from "../constants/global.ts"
 import { moveBall } from "./ball.ts"
 
@@ -8,20 +8,25 @@ export function printScreen({
     paddelPositionP2,
     ballPosition,
 }: PrintScreenParams) {
-    // y,x
-    const mapGrid = Array.from({ length: mapY }, () => Array.from({ length: mapX }, () => " "))
 
-    // make Grid
+    // make Grid (y,x)
+    const mapGrid: GameGrid = new Map()
+
     for (let y = 0; y < mapY; y++) {
+        const isYBorder = y === 0 || y === mapY - 1
+        const isOnYPpaddelPositionP1 = y >= paddelPositionP1.topY && y <= paddelPositionP1.bottomY
+        const isOnYPpaddelPositionP2 = y >= paddelPositionP2.topY && y <= paddelPositionP2.bottomY
+
         for (let x = 0; x < mapX; x++) {
             const isNet = x === Math.floor(mapX / 2)
-            const isBorder = y === 0 || y === mapY - 1 || x === 0 || x === mapX - 1
-            const isPaddleP1 = x === 2 && y >= paddelPositionP1.topY && y <= paddelPositionP1.bottomY
-            const isPaddleP2 = x === mapX - 3 && y >= paddelPositionP2.topY && y <= paddelPositionP2.bottomY
+            const isBorder = isYBorder || x === 0 || x === mapX - 1
+            const isPaddleP1 = x === 2 && isOnYPpaddelPositionP1
+            const isPaddleP2 = x === mapX - 3 && isOnYPpaddelPositionP2
 
-            if (isBorder) mapGrid[y][x] = "@"
-            else if (isNet) mapGrid[y][x] = "|"
-            else if (isPaddleP1 || isPaddleP2) mapGrid[y][x] = "#"
+            if (isBorder) mapGrid.set(`${y},${x}`, "@")
+            else if (isNet) mapGrid.set(`${y},${x}`, "|")
+            else if (isPaddleP1 || isPaddleP2) mapGrid.set(`${y},${x}`, "#")
+            else mapGrid.set(`${y},${x}`, " ")
         }
     }
 
@@ -33,7 +38,7 @@ export function printScreen({
         ballPosition,
     })
     // set ball
-    mapGrid[newBall.y][newBall.x] = "o"
+    mapGrid.set(`${newBall.y},${newBall.x}`, "o")
 
     // render map
     renderGrid({gameGrid: mapGrid, debug: null})
@@ -83,8 +88,15 @@ function renderGrid({
 
     console.log(`P1 (up: w, down: s), P2 (up: arrow up, down: arrow down)            P1 0 / P2 0`) // TODO: points
 
-    for (const row of gameGrid) {
-        console.log(row.join(""))
+    for (let y = 0; y < GLOBALS.MAP_Y; y++) {
+        let line = ""
+
+        for (let x = 0; x < GLOBALS.MAP_X; x++) {
+            const cell = gameGrid.get(`${y},${x}`)
+            line += cell
+        }
+
+        console.log(line)
     }
 
     if (debug) console.log(debug)
