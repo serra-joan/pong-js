@@ -18,10 +18,12 @@ export function moveBall({
 
     // X
         // check if the ball touc the paddel
+        // paddel 2
     if (newBall.x +1 === mapX - 3 && (newBall.y <= paddelPositionP2.bottomY && newBall.y >= paddelPositionP2.topY)) {
         newBall.x = newBall.x - 1
         newBall.direction.x = newBall.direction.x * -1
-            
+        
+        // paddel 1
     }else if (newBall.x -1 === 2 && (newBall.y <= paddelPositionP1.bottomY && newBall.y >= paddelPositionP1.topY)) {
         newBall.x = newBall.x + 1
         newBall.direction.x = newBall.direction.x * -1
